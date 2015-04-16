@@ -1,0 +1,277 @@
+[
+  {
+    "abbr": "AK",
+    "id": 2,
+    "name": "ALASKA"
+  },
+  {
+    "abbr": "AL",
+    "id": 1,
+    "name": "ALABAMA"
+  },
+  {
+    "abbr": "AR",
+    "id": 5,
+    "name": "ARKANSAS"
+  },
+  {
+    "abbr": "AS",
+    "id": 60,
+    "name": "AMERICAN SAMOA"
+  },
+  {
+    "abbr": "AZ",
+    "id": 4,
+    "name": "ARIZONA"
+  },
+  {
+    "abbr": "CA",
+    "id": 6,
+    "name": "CALIFORNIA"
+  },
+  {
+    "abbr": "CO",
+    "id": 8,
+    "name": "COLORADO"
+  },
+  {
+    "abbr": "CT",
+    "id": 9,
+    "name": "CONNECTICUT"
+  },
+  {
+    "abbr": "DC",
+    "id": 11,
+    "name": "DISTRICT OF COLUMBIA"
+  },
+  {
+    "abbr": "DE",
+    "id": 10,
+    "name": "DELAWARE"
+  },
+  {
+    "abbr": "FL",
+    "id": 12,
+    "name": "FLORIDA"
+  },
+  {
+    "abbr": "GA",
+    "id": 13,
+    "name": "GEORGIA"
+  },
+  {
+    "abbr": "GU",
+    "id": 66,
+    "name": "GUAM"
+  },
+  {
+    "abbr": "HI",
+    "id": 15,
+    "name": "HAWAII"
+  },
+  {
+    "abbr": "IA",
+    "id": 19,
+    "name": "IOWA"
+  },
+  {
+    "abbr": "ID",
+    "id": 16,
+    "name": "IDAHO"
+  },
+  {
+    "abbr": "IL",
+    "id": 17,
+    "name": "ILLINOIS"
+  },
+  {
+    "abbr": "IN",
+    "id": 18,
+    "name": "INDIANA"
+  },
+  {
+    "abbr": "KS",
+    "id": 20,
+    "name": "KANSAS"
+  },
+  {
+    "abbr": "KY",
+    "id": 21,
+    "name": "KENTUCKY"
+  },
+  {
+    "abbr": "LA",
+    "id": 22,
+    "name": "LOUISIANA"
+  },
+  {
+    "abbr": "MA",
+    "id": 25,
+    "name": "MASSACHUSETTS"
+  },
+  {
+    "abbr": "MD",
+    "id": 24,
+    "name": "MARYLAND"
+  },
+  {
+    "abbr": "ME",
+    "id": 23,
+    "name": "MAINE"
+  },
+  {
+    "abbr": "MI",
+    "id": 26,
+    "name": "MICHIGAN"
+  },
+  {
+    "abbr": "MN",
+    "id": 27,
+    "name": "MINNESOTA"
+  },
+  {
+    "abbr": "MO",
+    "id": 29,
+    "name": "MISSOURI"
+  },
+  {
+    "abbr": "MS",
+    "id": 28,
+    "name": "MISSISSIPPI"
+  },
+  {
+    "abbr": "MT",
+    "id": 30,
+    "name": "MONTANA"
+  },
+  {
+    "abbr": "NC",
+    "id": 37,
+    "name": "NORTH CAROLINA"
+  },
+  {
+    "abbr": "ND",
+    "id": 38,
+    "name": "NORTH DAKOTA"
+  },
+  {
+    "abbr": "NE",
+    "id": 31,
+    "name": "NEBRASKA"
+  },
+  {
+    "abbr": "NH",
+    "id": 33,
+    "name": "NEW HAMPSHIRE"
+  },
+  {
+    "abbr": "NJ",
+    "id": 34,
+    "name": "NEW JERSEY"
+  },
+  {
+    "abbr": "NM",
+    "id": 35,
+    "name": "NEW MEXICO"
+  },
+  {
+    "abbr": "NV",
+    "id": 32,
+    "name": "NEVADA"
+  },
+  {
+    "abbr": "NY",
+    "id": 36,
+    "name": "NEW YORK"
+  },
+  {
+    "abbr": "OH",
+    "id": 39,
+    "name": "OHIO"
+  },
+  {
+    "abbr": "OK",
+    "id": 40,
+    "name": "OKLAHOMA"
+  },
+  {
+    "abbr": "OR",
+    "id": 41,
+    "name": "OREGON"
+  },
+  {
+    "abbr": "PA",
+    "id": 42,
+    "name": "PENNSYLVANIA"
+  },
+  {
+    "abbr": "PR",
+    "id": 72,
+    "name": "PUERTO RICO"
+  },
+  {
+    "abbr": "RI",
+    "id": 44,
+    "name": "RHODE ISLAND"
+  },
+  {
+    "abbr": "SC",
+    "id": 45,
+    "name": "SOUTH CAROLINA"
+  },
+  {
+    "abbr": "SD",
+    "id": 46,
+    "name": "SOUTH DAKOTA"
+  },
+  {
+    "abbr": "TN",
+    "id": 47,
+    "name": "TENNESSEE"
+  },
+  {
+    "abbr": "TX",
+    "id": 48,
+    "name": "TEXAS"
+  },
+  {
+    "abbr": "UT",
+    "id": 49,
+    "name": "UTAH"
+  },
+  {
+    "abbr": "VA",
+    "id": 51,
+    "name": "VIRGINIA"
+  },
+  {
+    "abbr": "VI",
+    "id": 78,
+    "name": "VIRGIN ISLANDS"
+  },
+  {
+    "abbr": "VT",
+    "id": 50,
+    "name": "VERMONT"
+  },
+  {
+    "abbr": "WA",
+    "id": 53,
+    "name": "WASHINGTON"
+  },
+  {
+    "abbr": "WI",
+    "id": 55,
+    "name": "WISCONSIN"
+  },
+  {
+    "abbr": "WV",
+    "id": 54,
+    "name": "WEST VIRGINIA"
+  },
+  {
+    "abbr": "WY",
+    "id": 56,
+    "name": "WYOMING"
+  }
+]

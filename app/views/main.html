@@ -1,0 +1,11 @@
+<h4> Map Data</h4>
+
+<div id="map" class="col-xs-8"></div>
+
+<div class="col-xs-4">
+  <ul class="list-group">
+    <li class="list-group-item" ng-repeat="(state, score) in scores">
+      <a href="" ng-click="clickState()">{{ state | capitalize }}</a>
+    </li>
+  </ul>
+</div>
