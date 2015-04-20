@@ -4,34 +4,64 @@
 
 <div class="col-sm-4 score-list" style="height:{{ getSvgHeight() + 'px' }};">
 
-  <ul class="list-group">
-    <li class="list-group-item" ng-repeat="(id, score) in scores | matchFIPS:selectedStateId">
-      <a href="" ng-click="clickState()">{{ score.stateName | capitalize }}</a>
-      <span class="label label-default pull-right" style="color:{{ getColor( score.score ) }}">
-        <small>{{ score.tallies.length }} stores. {{ score.score | number:1 }}/100</small>&nbsp;&nbsp;
-        <i class="glyphicon glyphicon-heart pull-right"></i>
-      </span>
+  <div class="sort-panel">
+    <div class="btn-group" dropdown is-open="status.isopen">
+      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+        {{ comparator }} <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="" ng-click="comparator = 'score'; reverseOrder = true">Score</a>
+        </li>
+        <li>
+          <a href="" ng-click="comparator = 'stateName'; reverseOrder = false">State Name</a>
+        </li>
+        <li>
+          <a href="" ng-click="comparator = 'tallies.length'; reverseOrder = true">Number of Stores</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <ul class="list-group state-list" ng-if="!selectedStore">
+    <li class="list-group-item" ng-class="{'selectedStateId':selectedStateId}" ng-repeat="score in scores | matchFIPS:selectedStateId | orderBy:comparator:reverseOrder">
+      <a href="" ng-click="clickState()" ng-mouseover="stateHover()" ng-mouseleave="stateHoverOut()">
+        <strong>
+          <i class="glyphicon glyphicon-zoom-out back-btn" ng-if="selectedStateId"></i>
+          <i style="color:{{ getStateColor( score.score ) }}" class="glyphicon glyphicon-heart"></i>
+          {{ score.stateName | capitalize }}
+        </strong>
+        <div>
+          <span class="badge">{{ score.tallies.length }} stores</span>
+          <span class="label label-default" style="background:{{ getStateColor( score.score ) }}">State Avg. {{ score.score | number:1 }}/100</span>
+        </div>
+      </a>
     </li>
   </ul>
 
-  <ul class="list-group" ng-if="selectedStateId">
+  <div class="state-legend" ng-if="selectedStateId && !selectedStore">
+    <span class="value" ng-repeat="color in rangeColors" style="background:{{ color }};">
+      {{ getStateRangeLabel(selectedStateId)[$index] }}
+    </span>
+  </div>
+
+  <ul class="list-group store-list" ng-if="selectedStateId" ng-class="{'selectedStore':selectedStore}">
     <li
       class="list-group-item"
-      ng-repeat="location in getLocations() | filter:{stateId:selectedStateId} | matchStoreId:selectedStore"
-      ng-mouseover="locationHover()"
-      ng-mouseleave="locationHoverOut()"
-      ng-click="lockLocation()"
+      ng-repeat="location in getLocations() | filter:{stateId:selectedStateId} | matchStoreId:selectedStore | orderBy:'metric':true"
     >
-      {{ location.address }}<br ng-if="location.addressLineTwo"/>
-      {{ location.addressLineTwo }}<br/>
-      {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br/>
-      Store ID: {{ location.storeId }}<br/>
-      <span style="color:{{ getColor(location.metric) }};">Store Metric: {{ location.metric }} / 100</span><br/>
-      Region: {{ location.region }}<br/>
+      <a href="" ng-mouseover="locationHover()" ng-mouseleave="locationHoverOut()" ng-click="lockLocation()">
+        {{ location.address }}<br ng-if="location.addressLineTwo"/>
+        {{ location.addressLineTwo }}<br/>
+        {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br/>
+        Store ID: {{ location.storeId }}<br/>
+        <span class="label label-default" style="background:{{ getScoreColor(location.metric, location.stateId) }};">Store Metric: {{ location.metric }} / 100</span><br/>
+        Region: {{ location.region }}<br/>
+      </a>
     </li>
   </ul>
 
-  <ul class="list-group" ng-if="selectedStore">
+  <ul class="list-group item-list" ng-if="selectedStore">
     <li class="list-group-item" ng-repeat="foo in [0,1,2,3,4,5]">
       More info about this store...
     </li>

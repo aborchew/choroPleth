@@ -13,9 +13,10 @@ angular.module('choroplethApp')
     // @TODO (aborchew): Move these to a route/state resolve once we integrate with an actual application
     var mapReq = $http.get('scripts/us.json'),
       locationReq = $http.get('scripts/locationsList.json'),
+      rangeColors = [ '#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641'],
       width,
       height,
-      scores = {},
+      scores = [],
       centered,
       previousCentered,
       g,
@@ -25,12 +26,15 @@ angular.module('choroplethApp')
       map,
       locations,
       fips,
-      color,
+      stateColor,
+      getScoreColor,
       resizeInterval,
       resizeTimeout = false,
       resizeDelta = 250,
       transTime = 750,
-      locationLocked = false;
+      locationLocked = false,
+      comparator = 'score',
+      reverseOrder = true;
 
     $q.all([mapReq, locationReq])
       .then(function (responses) {
@@ -42,28 +46,71 @@ angular.module('choroplethApp')
 
           var stateId = location.stateId,
             max = 100,
-            min = 0;
+            min = 0,
+            scoreMatch = $filter('filter')(scores, {id:stateId}, true);
 
           location.metric = Math.floor(Math.random() * (max-min)) + min + 1;
 
-          if(!scores[stateId]) {
-            scores[stateId] = {
+          if(scoreMatch.length !== 1) {
+            scores.push({
               'tallies': [location.metric],
               'stateName': location.state,
               'id': stateId
-            };
+            });
           } else {
-            scores[stateId].tallies.push(location.metric);
+            scoreMatch[0].tallies.push(location.metric);
           }
 
         });
 
-        ready()
+        angular.forEach(scores, function (score) {
+
+          var scoreDomainMin = d3.min(score.tallies),
+            scoreDomainMax = d3.max(score.tallies),
+            scoreDomainAvg = (scoreDomainMin + scoreDomainMax) / 2;
+
+          score.colorScale = d3.scale.linear()
+            .domain([
+              scoreDomainMin,
+              (scoreDomainAvg + scoreDomainMin) / 2,
+              scoreDomainAvg,
+              (scoreDomainAvg + scoreDomainMax) / 2,
+              scoreDomainMax
+            ])
+            .range(rangeColors);
+
+          score.legendLabels = [
+            '<= ' + Math.floor(score.colorScale.domain()[0]),
+            Math.floor(score.colorScale.domain()[1]) + ' +',
+            Math.floor(score.colorScale.domain()[2]) + ' +',
+            Math.floor(score.colorScale.domain()[3]) + ' +',
+            '>= ' + Math.floor(score.colorScale.domain()[4])
+          ]
+
+          console.log(score);
+
+        })
+
+        ready();
 
       })
 
-    function getColor (score) {
-      return color ? color(score) : 'inherit';
+    function getStateName (id) {
+      return $filter('filter')(scores, {id:id}, true)[0].stateName;
+    }
+
+    function getStateRangeLabel (id) {
+      return $filter('filter')(scores, {id:id}, true)[0].legendLabels;
+    }
+
+    function getStateColor (score) {
+      return stateColor ? stateColor(score) : 'inherit';
+    }
+
+    function getScoreColor (score, stateId) {
+      var scoreMatch = $filter('filter')(scores, {id: stateId}, true);
+      if(scoreMatch.length !== 1 || !scoreMatch[0].colorScale) return 'inherit';
+      return (scoreMatch[0].colorScale(score));
     }
 
     function clickState () {
@@ -84,11 +131,12 @@ angular.module('choroplethApp')
       var x,
         y,
         k,
-        divisor;
+        divisor,
+        scoreMatch = $filter('filter')(scores, {id:d.id}, true);
 
       divisor = 2;
 
-      if(!d || !d.id || !scores[d.id]) return;
+      if(!d || !d.id || scoreMatch.length !== 1) return;
 
       if (d && ((centered && centered.id !== d.id) || !centered)) {
         var centroid = path.centroid(d);
@@ -130,6 +178,22 @@ angular.module('choroplethApp')
       $timeout(function () {
         $scope.selectedStateId = centered ? centered.id : null;
       }, 0);
+
+    }
+
+    function stateHover () {
+
+      var state = svg.select('[data-state-id=state' + this.score.id + ']');
+      state
+        .classed('hovered', true)
+
+    }
+
+    function stateHoverOut () {
+
+      var state = svg.select('[data-state-id=state' + this.score.id + ']');
+      state
+        .classed('hovered', false)
 
     }
 
@@ -216,53 +280,35 @@ angular.module('choroplethApp')
       })
 
       function actualMin () {
-        var min;
-        angular.forEach(scores, function (state) {
-          if(!min || state.score < min) {
-            min = state.score;
-          }
-        })
-        return min;
+        return ;
       }
 
       function actualMax () {
-        var max;
-        angular.forEach(scores, function (state) {
-          if(!max || state.score > max) {
-            max = state.score;
-          }
-        })
-        return max;
+        return d3.max(scores, function (d) { return d.score });
       }
 
-      var rangeMin = actualMin(),
-        rangeMax = actualMax(),
-        avg = (rangeMax + rangeMin) / 2,
+      var stateDomainMin = d3.min(scores, function (d) { return d.score }),
+        stateDomainMax = d3.max(scores, function (d) { return d.score }),
+        stateDomainAvg = (stateDomainMax + stateDomainMin) / 2,
         legendLabels;
 
-      color = d3.scale.linear()
+      stateColor = d3.scale.linear()
         .domain([
-          rangeMin,
-          (avg + rangeMin) / 2,
-          avg,
-          (avg + rangeMax) / 2,
-          rangeMax
+          stateDomainMin,
+          (stateDomainAvg + stateDomainMin) / 2,
+          stateDomainAvg,
+          (stateDomainAvg + stateDomainMax) / 2,
+          stateDomainMax
         ])
-        .range([
-          '#d7191c',
-          '#fdae61',
-          '#ffffbf',
-          '#a6d96a',
-          '#1a9641'
-        ]);
+        .range(rangeColors);
 
       legendLabels = [
-          '<= ' + Math.floor(color.domain()[0]),
-          Math.floor(color.domain()[1]) + ' +',
-          Math.floor(color.domain()[2]) + ' +',
-          Math.floor(color.domain()[3]) + ' +',
-          '>= ' + Math.floor(color.domain()[4])
-        ]
+        '<= ' + Math.floor(stateColor.domain()[0]),
+        Math.floor(stateColor.domain()[1]) + ' +',
+        Math.floor(stateColor.domain()[2]) + ' +',
+        Math.floor(stateColor.domain()[3]) + ' +',
+        '>= ' + Math.floor(stateColor.domain()[4])
+      ]
 
       g = svg.append('g');
 
@@ -273,10 +319,29 @@ angular.module('choroplethApp')
         .enter().append('path')
           .attr('d', path)
           .on('click', clicked)
-          .attr('fill', function (state) {
-            if(scores[state.id]) {
-              return color(scores[state.id].score);
+          .attr('data-state-id', function (d) {
+            return 'state' + d.id;
+          })
+          .attr('fill', function (d) {
+            var scoreMatch = $filter('filter')(scores, {id:d.id}, true)
+            if(scoreMatch.length === 1) {
+              d.hasScore = true;
+              d.scoreColor = stateColor(scoreMatch[0].score);
+              return d.scoreColor;
             }
+          })
+          .classed('state', function (d) {
+            return d.hasScore;
+          })
+          .on('mouseover', function (d) {
+            if(!d.hasScore) return;
+            d3.select(this)
+              .classed('hovered', true);
+          })
+          .on('mouseout', function (d) {
+            if(!d.hasScore) return;
+            d3.select(this)
+              .classed('hovered', false)
           })
 
       g.append('path')
@@ -297,7 +362,7 @@ angular.module('choroplethApp')
         })
 
       var legend = svg.selectAll('g.legend')
-        .data(color.domain())
+        .data(stateColor.domain())
         .enter().append('g')
         .attr('class', 'legend');
 
@@ -308,7 +373,7 @@ angular.module('choroplethApp')
           .attr('y', function(d, i){ return height - (i*ls_h) - 2*ls_h;})
           .attr('width', ls_w)
           .attr('height', ls_h)
-          .style('fill', function(d, i) { return color(d); })
+          .style('fill', function(d, i) { return stateColor(d); })
           .style('opacity', 0.8);
 
         legend.append('text')
@@ -351,10 +416,18 @@ angular.module('choroplethApp')
     $scope.scores = scores;
     $scope.getLocations = function () { return locations; };
     $scope.getSvgHeight = function () { return height; };
+    $scope.stateHover = stateHover;
+    $scope.stateHoverOut = stateHoverOut;
     $scope.clickState = clickState;
     $scope.locationHover = locationHover;
     $scope.locationHoverOut = locationHoverOut;
     $scope.lockLocation = lockLocation;
-    $scope.getColor = getColor;
+    $scope.getStateColor = getStateColor;
+    $scope.getScoreColor = getScoreColor;
+    $scope.rangeColors = rangeColors;
+    $scope.getStateName = getStateName;
+    $scope.getStateRangeLabel = getStateRangeLabel;
+    $scope.comparator = comparator;
+    $scope.reverseOrder = reverseOrder;
 
   });

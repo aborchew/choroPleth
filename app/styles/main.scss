@@ -20,13 +20,18 @@ header {
   margin-bottom: 10px;
 }
 
+a,
+a:hover {
+  text-decoration: none;
+}
+
 footer {
   padding-top: 19px;
   color: #777;
   border-top: 1px solid #e5e5e5;
   line-height: 30px;
+  margin: 20px 0 0 0;
   a, a:hover {
-    text-decoration: none;
     color: inherit;
   }
   img {
@@ -36,12 +41,139 @@ footer {
 }
 
 .score-list {
-  overflow-y: scroll;
   position: relative;
-  .fix-to-top {
-    position: fixed;
-    top: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.state-list {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: 40px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: scroll;
+
+  li {
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    &:nth-child(even) {
+      background: rgba(0,0,0,.05);
+    }
+
+    a {
+      color: inherit;
+      display: block;
+      padding: 10px;
+
+      &:hover {
+        background: rgba(0,0,0,.15);
+      }
+
+      div {
+        display: block;
+
+        .label {
+          color: black;
+        }
+
+      }
+
+    }
+
+    &.selectedStateId a {
+      padding-left: 70px;
+
+      &:hover {
+        background: rgba(0,0,0,.1);
+        .back-btn {
+          background: rgba(0,0,0,.2);
+        }
+      }
+
+      .back-btn {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 60px;
+        line-height: 60px;
+        font-size: 20px;
+        text-align: center;
+      }
+
+    }
+
   }
+
+}
+
+.state-legend {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0px;
+  left: 0;
+  font-size: 11px;
+  color: white;
+  padding: 5px 10px 0 10px;
+  border-top: 1px solid rgba(0,0,0,.25);
+
+  .value {
+    float: left;
+    width: 20%;
+    display: block;
+    font-weight: bold;
+    text-align: center;
+  }
+
+}
+
+.store-list,
+.item-list {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: 100px;
+  right: 0;
+  bottom: 30px;
+  left: 0;
+  overflow-y: scroll;
+
+  li {
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    a {
+      padding: 10px;
+      color: inherit;
+      display: block;
+    }
+
+    &:nth-child(odd) a {
+      background: rgba(0,0,0,.05);
+    }
+
+    a:hover {
+      background: rgba(44,123,182,1);
+      color: white;
+    }
+
+  }
+
+}
+
+.store-list.selectedStore {
+  top: 40px;
+}
+
+.item-list {
+  top: 160px;
+  bottom:0;
 }
 
 // Map
@@ -69,6 +201,14 @@ footer {
     stroke: white;
     stroke-width: 0;
     stroke-linejoin: round;
+  }
+
+  .state {
+    cursor: pointer;
+    transition: fill 250ms;
+    &.hovered {
+      fill: #2c7bb6;
+    }
   }
 
   .location {
