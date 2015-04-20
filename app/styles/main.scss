@@ -3,6 +3,8 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 @import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
 // endbower
 
+@import "animations.scss";
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;
@@ -33,9 +35,27 @@ footer {
   }
 }
 
+.score-list {
+  overflow-y: scroll;
+  position: relative;
+  .fix-to-top {
+    position: fixed;
+    top: 0;
+  }
+}
+
 // Map
 
 #map {
+
+  svg {
+    opacity: 1;
+    transition: opacity 750ms;
+  }
+
+  svg.resizing {
+    opacity: 0;
+  }
 
   .state-borders {
     fill: none;
@@ -53,10 +73,22 @@ footer {
 
   .location {
     fill: rgba(0,0,0,0);
-    transition: fill 750ms;
+    transition: all 750ms;
     &.visible {
-      fill: rgba(0,0,0,1);
+      fill: rgba(0,0,0,.5);
+      stroke-width: 0;
+      stroke: rgba(255,255,255,0);
     }
+    &.hovered {
+      stroke-width: .5px;
+      stroke: white;
+      fill: rgba(44,123,182,1);
+      box-shadow: 1px 1px 3px rgba(0,0,0,.25);
+    }
+  }
+
+  .legend {
+    font-size: 12px;
   }
 
 }

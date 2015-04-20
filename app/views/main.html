@@ -1,11 +1,40 @@
-<h4> Map Data</h4>
+<h4>All Locations ranked based on randomly generated numbers between 1 and 100.</h4>
 
-<div id="map" class="col-xs-8"></div>
+<div id="map" class="col-sm-8"></div>
 
-<div class="col-xs-4">
+<div class="col-sm-4 score-list" style="height:{{ getSvgHeight() + 'px' }};">
+
   <ul class="list-group">
-    <li class="list-group-item" ng-repeat="(state, score) in scores">
-      <a href="" ng-click="clickState()">{{ state | capitalize }}</a>
+    <li class="list-group-item" ng-repeat="(id, score) in scores | matchFIPS:selectedStateId">
+      <a href="" ng-click="clickState()">{{ score.stateName | capitalize }}</a>
+      <span class="label label-default pull-right" style="color:{{ getColor( score.score ) }}">
+        <small>{{ score.tallies.length }} stores. {{ score.score | number:1 }}/100</small>&nbsp;&nbsp;
+        <i class="glyphicon glyphicon-heart pull-right"></i>
+      </span>
     </li>
   </ul>
+
+  <ul class="list-group" ng-if="selectedStateId">
+    <li
+      class="list-group-item"
+      ng-repeat="location in getLocations() | filter:{stateId:selectedStateId} | matchStoreId:selectedStore"
+      ng-mouseover="locationHover()"
+      ng-mouseleave="locationHoverOut()"
+      ng-click="lockLocation()"
+    >
+      {{ location.address }}<br ng-if="location.addressLineTwo"/>
+      {{ location.addressLineTwo }}<br/>
+      {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br/>
+      Store ID: {{ location.storeId }}<br/>
+      <span style="color:{{ getColor(location.metric) }};">Store Metric: {{ location.metric }} / 100</span><br/>
+      Region: {{ location.region }}<br/>
+    </li>
+  </ul>
+
+  <ul class="list-group" ng-if="selectedStore">
+    <li class="list-group-item" ng-repeat="foo in [0,1,2,3,4,5]">
+      More info about this store...
+    </li>
+  </ul>
+
 </div>
