@@ -45,8 +45,8 @@ angular.module('choroplethApp')
         angular.forEach(locations, function (location) {
 
           var stateId = location.stateId,
-            max = 100,
-            min = 0,
+            max = 10000,
+            min = 1,
             scoreMatch = $filter('filter')(scores, {id:stateId}, true);
 
           location.metric = Math.floor(Math.random() * (max-min)) + min + 1;
