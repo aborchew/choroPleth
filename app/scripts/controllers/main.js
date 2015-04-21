@@ -8,7 +8,7 @@
  * Controller of the choroplethApp
  */
 angular.module('choroplethApp')
-  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout) {
+  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout, $modal, $location) {
 
     // @TODO (aborchew): Move these to a route/state resolve once we integrate with an actual application
     var mapReq = $http.get('scripts/us.json'),
@@ -33,8 +33,9 @@ angular.module('choroplethApp')
       resizeDelta = 250,
       transTime = 750,
       locationLocked = false,
-      comparator = 'score',
-      reverseOrder = true;
+      reverseOrder = true,
+      totalOrAverage = 'average',
+      comparator = 'average';
 
     $q.all([mapReq, locationReq])
       .then(function (responses) {
@@ -87,11 +88,10 @@ angular.module('choroplethApp')
             '>= ' + Math.floor(score.colorScale.domain()[4])
           ]
 
-          console.log(score);
-
         })
 
         ready();
+        parseSearchParams();
 
       })
 
@@ -113,9 +113,9 @@ angular.module('choroplethApp')
       return (scoreMatch[0].colorScale(score));
     }
 
-    function clickState () {
+    function clickState (stateId) {
 
-      var fipsId = this.score.id,
+      var fipsId = parseInt(stateId) || this.score.id,
         stateData = $filter('filter')(topojson.feature(map, map.objects.states).features, {id:fipsId}, true)[0];
 
       clicked(stateData);
@@ -144,11 +144,13 @@ angular.module('choroplethApp')
         y = centroid[1];
         k = 4;
         centered = d;
+        $location.search('s', d.id);
       } else {
         x = width / divisor;
         y = height / divisor;
         k = 1;
         centered = null;
+        $location.search('s', null);
       }
 
       g.selectAll('path')
@@ -164,7 +166,7 @@ angular.module('choroplethApp')
         .attr('transform', 'translate(' + width / divisor + ',' + height / divisor + ')scale(' + k + ')translate(' + -x + ',' + -y + ')')
         .selectAll('circle.location')
           .attr('class', function (subD) {
-            return centered && subD.stateId === centered.id ? 'location visible' : 'location';
+            return centered && subD.stateId === centered.id ? 'location visible' : 'l';
           })
           .attr('r', function (subD) {
             return centered && subD.stateId === centered.id ? 1 : 0;
@@ -230,29 +232,10 @@ angular.module('choroplethApp')
         .attr('r', 1)
     }
 
-    function lockLocation () {
-      locationLocked = !locationLocked;
-      if(locationLocked) {
-        $scope.selectedStore = this.location.storeId;
-      } else {
-        $scope.selectedStore = null;
-      }
-    }
-
     // Render map
     function ready () {
 
       var projection;
-
-      // angular.forEach(locations, function (location) {
-      //   var fipsMatch = $filter('filter')(fips, function (fipState) {
-      //     return fipState.name.toLowerCase() == location.state.toLowerCase();
-      //   })
-      //   location.stateAbbr = fipsMatch[0].abbr;
-      //   location.stateId = fipsMatch[0].id;
-      // })
-
-      // console.log(angular.toJson(locations));
 
       width = angular.element('#map').width();
       height = width * .65;
@@ -274,9 +257,10 @@ angular.module('choroplethApp')
         .attr('height', height);
 
       angular.forEach(scores, function (state) {
-        state.score = state.tallies.reduce(function (previous, current) {
+        state.total = state.tallies.reduce(function (previous, current) {
           return previous + current;
-        }, 0) / state.tallies.length;
+        }, 0)
+        state.average = state.total / state.tallies.length;
       })
 
       function actualMin () {
@@ -284,11 +268,11 @@ angular.module('choroplethApp')
       }
 
       function actualMax () {
-        return d3.max(scores, function (d) { return d.score });
+        return d3.max(scores, function (d) { return d[totalOrAverage] });
       }
 
-      var stateDomainMin = d3.min(scores, function (d) { return d.score }),
-        stateDomainMax = d3.max(scores, function (d) { return d.score }),
+      var stateDomainMin = d3.min(scores, function (d) { return d[totalOrAverage] }),
+        stateDomainMax = d3.max(scores, function (d) { return d[totalOrAverage] }),
         stateDomainAvg = (stateDomainMax + stateDomainMin) / 2,
         legendLabels;
 
@@ -326,7 +310,7 @@ angular.module('choroplethApp')
             var scoreMatch = $filter('filter')(scores, {id:d.id}, true)
             if(scoreMatch.length === 1) {
               d.hasScore = true;
-              d.scoreColor = stateColor(scoreMatch[0].score);
+              d.scoreColor = stateColor(scoreMatch[0][totalOrAverage]);
               return d.scoreColor;
             }
           })
@@ -355,7 +339,7 @@ angular.module('choroplethApp')
         .data(locations)
         .enter()
         .append('circle')
-        .attr('class', 'location')
+        .attr('class', 'l')
         .attr('r', 1)
         .attr('transform', function(d) {
           return 'translate(' + projection([d.longitude, d.latitude]) + ')';
@@ -413,6 +397,51 @@ angular.module('choroplethApp')
       }
     }
 
+    function parseSearchParams () {
+      angular.forEach($location.search(), function (val, key) {
+        switch(key) {
+          case 'l':
+            var locationMatch = $filter('filter')(locations, {storeId: val}, true)
+            if(locationMatch.length === 1) {
+              openLocation(locationMatch[0])
+            } else {
+              $location.search('l', null);
+            }
+            break;
+          case 's':
+            clickState(val)
+            break;
+        }
+      })
+    }
+
+    function openLocation (location) {
+
+      var location = location || this.location;
+
+      $location.search('l', location.storeId);
+
+      var modalInstance = $modal.open({
+        templateUrl: 'views/location.html',
+        controller: 'LocationCtrl',
+        size: 'lg',
+        resolve: {
+          location: function () {
+            return location;
+          }
+        }
+      });
+
+      modalInstance.result.then(function () {
+        // Confirm
+        $location.search('l', null);
+      }, function () {
+        // Cancel
+        $location.search('l', null);
+      });
+
+    }
+
     $scope.scores = scores;
     $scope.getLocations = function () { return locations; };
     $scope.getSvgHeight = function () { return height; };
@@ -421,7 +450,7 @@ angular.module('choroplethApp')
     $scope.clickState = clickState;
     $scope.locationHover = locationHover;
     $scope.locationHoverOut = locationHoverOut;
-    $scope.lockLocation = lockLocation;
+    $scope.openLocation = openLocation;
     $scope.getStateColor = getStateColor;
     $scope.getScoreColor = getScoreColor;
     $scope.rangeColors = rangeColors;
@@ -429,5 +458,6 @@ angular.module('choroplethApp')
     $scope.getStateRangeLabel = getStateRangeLabel;
     $scope.comparator = comparator;
     $scope.reverseOrder = reverseOrder;
+    $scope.totalOrAverage = totalOrAverage;
 
   });

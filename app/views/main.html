@@ -11,7 +11,7 @@
       </button>
       <ul class="dropdown-menu" role="menu">
         <li>
-          <a href="" ng-click="comparator = 'score'; reverseOrder = true">Score</a>
+          <a href="" ng-click="comparator = score[totalOrAverage]; reverseOrder = true">Score</a>
         </li>
         <li>
           <a href="" ng-click="comparator = 'stateName'; reverseOrder = false">State Name</a>
@@ -23,47 +23,54 @@
     </div>
   </div>
 
-  <ul class="list-group state-list" ng-if="!selectedStore">
+  <ul class="list-group state-list">
     <li class="list-group-item" ng-class="{'selectedStateId':selectedStateId}" ng-repeat="score in scores | matchFIPS:selectedStateId | orderBy:comparator:reverseOrder">
-      <a href="" ng-click="clickState()" ng-mouseover="stateHover()" ng-mouseleave="stateHoverOut()">
+      <a
+        href=""
+        ng-click="clickState()"
+        ng-mouseover="stateHover()"
+        ng-mouseleave="stateHoverOut()"
+        style="border-right: 5px solid {{ getStateColor( score[totalOrAverage] ) }};"
+      >
         <strong>
           <i class="glyphicon glyphicon-zoom-out back-btn" ng-if="selectedStateId"></i>
-          <i style="color:{{ getStateColor( score.score ) }}" class="glyphicon glyphicon-heart"></i>
           {{ score.stateName | capitalize }}
+          <span class="badge pull-right">{{ score.tallies.length }} stores</span>
         </strong>
-        <div>
-          <span class="badge">{{ score.tallies.length }} stores</span>
-          <span class="label label-default" style="background:{{ getStateColor( score.score ) }}">State Avg. {{ score.score | number:1 }}/100</span>
+        <div ng-if="totalOrAverage == 'average'">
+          Average Sales: {{ score[totalOrAverage] | number:2 }} per location
+        </div>
+        <div ng-if="totalOrAverage == 'total'">
+          Total Sales: {{ score[totalOrAverage] }}
         </div>
       </a>
     </li>
   </ul>
 
-  <div class="state-legend" ng-if="selectedStateId && !selectedStore">
+  <div class="state-legend" ng-if="selectedStateId">
     <span class="value" ng-repeat="color in rangeColors" style="background:{{ color }};">
       {{ getStateRangeLabel(selectedStateId)[$index] }}
     </span>
   </div>
 
-  <ul class="list-group store-list" ng-if="selectedStateId" ng-class="{'selectedStore':selectedStore}">
+  <ul class="list-group store-list" ng-if="selectedStateId">
     <li
       class="list-group-item"
-      ng-repeat="location in getLocations() | filter:{stateId:selectedStateId} | matchStoreId:selectedStore | orderBy:'metric':true"
+      ng-repeat="location in getLocations() | filter:{stateId:selectedStateId} | orderBy:'metric':true"
     >
-      <a href="" ng-mouseover="locationHover()" ng-mouseleave="locationHoverOut()" ng-click="lockLocation()">
+      <a href=""
+        ng-mouseover="locationHover()"
+        ng-mouseleave="locationHoverOut()"
+        ng-click="openLocation()"
+        style="border-right: 5px solid {{ getScoreColor(location.metric, location.stateId) }};"
+      >
         {{ location.address }}<br ng-if="location.addressLineTwo"/>
         {{ location.addressLineTwo }}<br/>
         {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br/>
         Store ID: {{ location.storeId }}<br/>
-        <span class="label label-default" style="background:{{ getScoreColor(location.metric, location.stateId) }};">Store Metric: {{ location.metric }} / 100</span><br/>
+        {{ totalOrAverage | capitalize }} Sales: {{ location.metric }}<br/>
         Region: {{ location.region }}<br/>
       </a>
-    </li>
-  </ul>
-
-  <ul class="list-group item-list" ng-if="selectedStore">
-    <li class="list-group-item" ng-repeat="foo in [0,1,2,3,4,5]">
-      More info about this store...
     </li>
   </ul>
 
