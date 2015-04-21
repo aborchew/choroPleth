@@ -166,7 +166,7 @@ angular.module('choroplethApp')
         .attr('transform', 'translate(' + width / divisor + ',' + height / divisor + ')scale(' + k + ')translate(' + -x + ',' + -y + ')')
         .selectAll('circle.location')
           .attr('class', function (subD) {
-            return centered && subD.stateId === centered.id ? 'location visible' : 'l';
+            return centered && subD.stateId === centered.id ? 'location visible' : 'location';
           })
           .attr('r', function (subD) {
             return centered && subD.stateId === centered.id ? 1 : 0;
@@ -339,7 +339,7 @@ angular.module('choroplethApp')
         .data(locations)
         .enter()
         .append('circle')
-        .attr('class', 'l')
+        .attr('class', 'location')
         .attr('r', 1)
         .attr('transform', function(d) {
           return 'translate(' + projection([d.longitude, d.latitude]) + ')';
