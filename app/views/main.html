@@ -24,7 +24,11 @@
   </div>
 
   <ul class="list-group state-list">
-    <li class="list-group-item" ng-class="{'selectedStateId':selectedStateId}" ng-repeat="score in scores | matchFIPS:selectedStateId | orderBy:comparator:reverseOrder">
+    <li
+      class="list-group-item"
+      ng-class="{'selectedStateId':selectedStateId}"
+      ng-repeat="score in scores | matchFIPS:selectedStateId | orderBy:comparator:reverseOrder"
+    >
       <a
         href=""
         ng-click="clickState()"
