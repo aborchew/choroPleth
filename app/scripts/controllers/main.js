@@ -8,12 +8,12 @@
  * Controller of the choroplethApp
  */
 angular.module('choroplethApp')
-  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout, $modal, $location) {
+  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout, $modal, $location, RangeColors) {
 
     // @TODO (aborchew): Move these to a route/state resolve once we integrate with an actual application
     var mapReq = $http.get('scripts/us.json'),
       locationReq = $http.get('scripts/locationsList.json'),
-      rangeColors = [ '#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641'],
+      rangeColors = RangeColors,
       width,
       height,
       scores = [],

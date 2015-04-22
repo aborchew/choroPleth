@@ -1,24 +1,44 @@
 <div class="modal-header">
-  <h3 class="modal-title">{{ location.longName }}</h3>
+  <h3 class="modal-title">
+    {{ location.longName }}
+    <button type="button" class="close" ng-click="ok()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </h3>
 </div>
 <div class="modal-body row">
-
   <div class="col-xs-12 col-sm-8">
     <div id="mapCanvas"></div>
   </div>
-
-  <address class="col-xs-12 col-sm-4">
-    {{ location.address }}<br ng-if="location.address" />
-    {{ location.addressLineTwo }}<br ng-if="location.addressLineTwo" />
-    {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br ng-if="location.postalCode" />
-    Store ID: {{ location.storeId }}<br ng-if="location.storeId" />
-    {{ totalOrAverage | capitalize }} Sales: {{ location.metric }}<br ng-if="location.metric" />
-    Region: {{ location.region }}<br ng-if="location.region" />
-  </address>
-
+  <div class="col-xs-12 col-sm-4">
+    <div class="col-xs-6 col-sm-12">
+      <address>
+        {{ location.address }}<br ng-if="location.address" />
+        {{ location.addressLineTwo }}<br ng-if="location.addressLineTwo" />
+        {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br ng-if="location.postalCode" />
+        Store ID: {{ location.storeId }}<br ng-if="location.storeId" />
+        {{ totalOrAverage | capitalize }} Sales: {{ location.metric }}<br ng-if="location.metric" />
+        Region: {{ location.region }}<br ng-if="location.region" />
+      </address>
+    </div>
+    <div ng-if="validAddress" class="col-xs-6 col-sm-12">
+      <hr class="hidden-xs" />
+      <h5>Get Directions</h5>
+      <div class="input-group">
+        <input id="pac-input" ng-model="startAddr" class="controls form-control" type="text" placeholder="From a Place">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" ng-disabled="!placeSelected()" ng-click="getDirections(true)">Go</button>
+        </span>
+      </div>
+      <br/>
+      <div class="input-group">
+        <button class="btn btn-default btn-block" ng-click="getDirections(false)">
+          From My Location
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-
 <div class="modal-footer">
-  <button class="btn btn-primary" ng-click="ok()">OK</button>
-  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-primary" ng-click="ok()">Close</button>
 </div>
