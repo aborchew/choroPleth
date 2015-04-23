@@ -8,12 +8,13 @@
  * Controller of the choroplethApp
  */
 angular.module('choroplethApp')
-  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout, $modal, $location, RangeColors) {
+  .controller('MainCtrl', function ($scope, $http, $q, $filter, $window, $timeout, $modal, $location, RangeColors, SortValues) {
 
     // @TODO (aborchew): Move these to a route/state resolve once we integrate with an actual application
     var mapReq = $http.get('scripts/us.json'),
       locationReq = $http.get('scripts/locationsList.json'),
       rangeColors = RangeColors,
+      metric = 'metric',
       width,
       height,
       scores = [],
@@ -35,7 +36,8 @@ angular.module('choroplethApp')
       locationLocked = false,
       reverseOrder = true,
       totalOrAverage = 'average',
-      comparator = 'average';
+      comparator,
+      comparatorLabel;
 
     $q.all([mapReq, locationReq])
       .then(function (responses) {
@@ -50,16 +52,16 @@ angular.module('choroplethApp')
             min = 1,
             scoreMatch = $filter('filter')(scores, {id:stateId}, true);
 
-          location.metric = Math.floor(Math.random() * (max-min)) + min + 1;
+          location[metric] = Math.floor(Math.random() * (max-min)) + min + 1;
 
           if(scoreMatch.length !== 1) {
             scores.push({
-              'tallies': [location.metric],
+              'tallies': [location[metric]],
               'stateName': location.state,
               'id': stateId
             });
           } else {
-            scoreMatch[0].tallies.push(location.metric);
+            scoreMatch[0].tallies.push(location[metric]);
           }
 
         });
@@ -92,6 +94,8 @@ angular.module('choroplethApp')
 
         ready();
         parseSearchParams();
+        var dS = SortValues[totalOrAverage];
+        updateSort(dS.v, dS.defaultToReverse, dS.label);
 
       })
 
@@ -114,12 +118,9 @@ angular.module('choroplethApp')
     }
 
     function clickState (stateId) {
-
       var fipsId = parseInt(stateId) || this.score.id,
         stateData = $filter('filter')(topojson.feature(map, map.objects.states).features, {id:fipsId}, true)[0];
-
       clicked(stateData);
-
     }
 
     // http://bl.ocks.org/mbostock/2206590
@@ -145,12 +146,14 @@ angular.module('choroplethApp')
         k = 4;
         centered = d;
         $location.search('s', d.id);
+        $scope.selectedStateId = d.id;
       } else {
         x = width / divisor;
         y = height / divisor;
         k = 1;
         centered = null;
         $location.search('s', null);
+        $scope.selectedStateId = null;
       }
 
       g.selectAll('path')
@@ -176,10 +179,6 @@ angular.module('choroplethApp')
           })
 
       transTime = 750;
-
-      $timeout(function () {
-        $scope.selectedStateId = centered ? centered.id : null;
-      }, 0);
 
     }
 
@@ -442,7 +441,17 @@ angular.module('choroplethApp')
 
     }
 
+    function updateSort (v, r, l) {
+      $scope.comparator = v;
+      $scope.comparatorLabel = l;
+      $scope.reverseOrder = r || false;
+    }
+
     $scope.scores = scores;
+    $scope.sortValues = SortValues;
+    $scope.reverseOrder = reverseOrder;
+    $scope.comparatorLabel = comparatorLabel;
+    $scope.updateSort = updateSort;
     $scope.getLocations = function () { return locations; };
     $scope.getSvgHeight = function () { return height; };
     $scope.stateHover = stateHover;
@@ -457,7 +466,6 @@ angular.module('choroplethApp')
     $scope.getStateName = getStateName;
     $scope.getStateRangeLabel = getStateRangeLabel;
     $scope.comparator = comparator;
-    $scope.reverseOrder = reverseOrder;
     $scope.totalOrAverage = totalOrAverage;
 
   });

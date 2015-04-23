@@ -4,29 +4,27 @@
 
 <div class="col-sm-4 score-list" style="height:{{ getSvgHeight() + 'px' }};">
 
-  <div class="sort-panel">
+  <div class="sort-panel" ng-if="!selectedStateId">
+    <button class="btn btn-primary" ng-click="reverseOrder = !reverseOrder">
+      <i class="glyphicon glyphicon-sort"></i>
+      <span ng-if="!reverseOrder">Ascendeing By</span>
+      <span ng-if="reverseOrder">Descending By</span>
+    </button>
     <div class="btn-group" dropdown is-open="status.isopen">
       <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-        {{ comparator }} <span class="caret"></span>
+        {{ comparatorLabel }} <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
-        <li>
-          <a href="" ng-click="comparator = score[totalOrAverage]; reverseOrder = true">Score</a>
-        </li>
-        <li>
-          <a href="" ng-click="comparator = 'stateName'; reverseOrder = false">State Name</a>
-        </li>
-        <li>
-          <a href="" ng-click="comparator = 'tallies.length'; reverseOrder = true">Number of Stores</a>
+        <li ng-repeat="sV in sortValues">
+          <a href="" ng-click="updateSort(sV.v, sV.defaultToReverse, sV.label)">{{ sV.label }}</a>
         </li>
       </ul>
     </div>
   </div>
 
-  <ul class="list-group state-list">
+  <ul class="list-group state-list" ng-class="{'selectedStateId':selectedStateId}">
     <li
       class="list-group-item"
-      ng-class="{'selectedStateId':selectedStateId}"
       ng-repeat="score in scores | matchFIPS:selectedStateId | orderBy:comparator:reverseOrder"
     >
       <a
@@ -68,12 +66,12 @@
         ng-click="openLocation()"
         style="border-right: 5px solid {{ getScoreColor(location.metric, location.stateId) }};"
       >
-        {{ location.address }}<br ng-if="location.addressLineTwo"/>
-        {{ location.addressLineTwo }}<br/>
-        {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br/>
-        Store ID: {{ location.storeId }}<br/>
-        {{ totalOrAverage | capitalize }} Sales: {{ location.metric }}<br/>
-        Region: {{ location.region }}<br/>
+        <span>{{ location.address }}<br ng-if="location.addressLineTwo"/>
+        {{ location.addressLineTwo }}<br/></span>
+        <span>{{ location.city }}<span ng-if="location.city">,</span> {{ location.state }} {{ location.postalCode }}</span><br/>
+        <span>Store ID: {{ location.storeId }}</span><br/>
+        <span>Total Sales: {{ location.metric }}</span><br/>
+        <span>Region: {{ location.region }}</span>
       </a>
     </li>
   </ul>

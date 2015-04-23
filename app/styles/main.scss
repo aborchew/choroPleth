@@ -40,10 +40,13 @@ footer {
   }
 }
 
+address {
+  margin: 0;
+}
+
 .score-list {
   position: relative;
   padding: 0;
-  overflow: hidden;
 }
 
 .state-list {
@@ -80,24 +83,34 @@ footer {
 
     }
 
-    &.selectedStateId a {
-      padding-left: 70px;
+  }
 
-      &:hover {
-        background: rgba(0,0,0,.1);
-        .back-btn {
-          background: rgba(0,0,0,.2);
+  &.selectedStateId {
+
+    top: 0;
+
+    li {
+
+      a {
+        padding-left: 70px;
+
+        &:hover {
+          background: rgba(0,0,0,.1);
+          .back-btn {
+            background: rgba(0,0,0,.2);
+          }
         }
-      }
 
-      .back-btn {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 60px;
-        line-height: 60px;
-        font-size: 20px;
-        text-align: center;
+        .back-btn {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 60px;
+          line-height: 60px;
+          font-size: 20px;
+          text-align: center;
+        }
+
       }
 
     }
@@ -110,12 +123,14 @@ footer {
   display: block;
   position: absolute;
   right: 0;
-  bottom: 0px;
+  bottom: 0;
   left: 0;
   font-size: 11px;
   color: white;
-  padding: 5px 10px 0 10px;
+  padding: 5px;
+  background: white;
   border-top: 1px solid rgba(0,0,0,.25);
+  z-index: 999;
 
   .value {
     float: left;
@@ -127,16 +142,16 @@ footer {
 
 }
 
-.store-list,
-.item-list {
+.store-list {
   position: absolute;
   margin: 0;
   padding: 0;
-  top: 100px;
+  top: 60px;
   right: 0;
-  bottom: 30px;
+  bottom: 25px;
   left: 0;
   overflow-y: scroll;
+  border-top: 1px solid rgba(0,0,0,.25);
 
   li {
     border: 0;
@@ -160,15 +175,6 @@ footer {
 
   }
 
-}
-
-.store-list.selectedStore {
-  top: 40px;
-}
-
-.item-list {
-  top: 160px;
-  bottom:0;
 }
 
 // Map
@@ -244,35 +250,4 @@ address {
 
 .pac-container {
   z-index: 9999;
-}
-
-.retrieving {
-  color: #F05134;
-}
-
-.signal {
-  border: 2px solid #F05134;
-  border-radius: 14px;
-  height: 14px;
-  opacity: 0;
-  width: 14px;
-  margin-bottom: -2px;
-  display: inline-block;
-
-  animation: pulsate 1s ease-out;
-  animation-iteration-count:infinite;
-}
-
-@keyframes pulsate {
-  0% {
-    transform:scale(.1);
-    opacity: 0.0;
-  }
-  50% {
-    opacity:1;
-  }
-  100% {
-    transform:scale(1);
-    opacity:0;
-  }
 }

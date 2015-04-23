@@ -15,10 +15,10 @@
       <address>
         {{ location.address }}<br ng-if="location.address" />
         {{ location.addressLineTwo }}<br ng-if="location.addressLineTwo" />
-        {{ location.city }}, {{ location.state }} {{ location.postalCode }}<br ng-if="location.postalCode" />
+        {{ location.city }}<span ng-if="location.city">,</span> {{ location.state }} {{ location.postalCode }}<br ng-if="location.postalCode" />
         Store ID: {{ location.storeId }}<br ng-if="location.storeId" />
-        {{ totalOrAverage | capitalize }} Sales: {{ location.metric }}<br ng-if="location.metric" />
-        Region: {{ location.region }}<br ng-if="location.region" />
+        Total Sales: {{ location.metric }}<br ng-if="location.metric" />
+        Region: {{ location.region }}
       </address>
     </div>
     <div ng-if="validAddress" class="col-xs-6 col-sm-12">
